@@ -5,8 +5,8 @@
    Tutorial 11
    Tutorial Case
 
-   Author: 
-   Date:   
+   Author: Ashlynn Hickman
+   Date:  2 March 2020
 
    Global Variables
    ================
@@ -54,11 +54,33 @@
 	
 */
 
+window.onload = init; 
+function init(){
+   document.getElementById("puzzleTitle").innerHTML = "Puzzle 1";
+   document.getElementById("puzzle").innerHTML = drawPuzzle(puzzle1Hint, puzzle1Rating, puzzle1);
 
+   var puzzleButtons = document.getElementsByClassName("puzzles");
+   for(var i = 0; i < puzzleButtons.length; i++){
+      puzzleButtons[i].onclick = swapPuzzle;
+   }
+}
 
-
-
-
+function swapPuzzle(e){
+   var puzzleID = e.target.id; 
+   var puzzleTitle = e.target.value;
+   document.getElementById("puzzleTitle").innerHTML = puzzleTitle;
+   switch(puzzleID){
+      case "puzzle1": 
+         document.getElementById("puzzle").innerHTML = drawPuzzle(puzzle1Hint, puzzle1Rating, puzzle1);
+         break; 
+      case "puzzle2":
+         document.getElementById("puzzle").innerHTML = drawPuzzle(puzzle2Hint, puzzle2Rating, puzzle2); 
+         break; 
+      case "puzzle3":
+         document.getElementById("puzzle").innerHTML = drawPuzzle(puzzle3Hint, puzzle3Rating, puzzle3);
+         break;
+   }
+}
          
 /* ================================================================= */
 
