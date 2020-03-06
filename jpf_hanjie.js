@@ -55,6 +55,9 @@
 */
 
 window.onload = init; 
+var puzzleCells; 
+var cellBackground; 
+
 function init(){
    document.getElementById("puzzleTitle").innerHTML = "Puzzle 1";
    document.getElementById("puzzle").innerHTML = drawPuzzle(puzzle1Hint, puzzle1Rating, puzzle1);
@@ -63,6 +66,30 @@ function init(){
    for(var i = 0; i < puzzleButtons.length; i++){
       puzzleButtons[i].onclick = swapPuzzle;
    }
+
+   setupPuzzle();
+
+   // add an event listener for the mouseup event 
+   document.addEventListener("mouseup", endBackground); 
+
+   // add event listener to the show solution button 
+   document.getElementById("solve").addEventListener("click", 
+      function(){
+         // remove the inline background color styles for each cell 
+         for(var i = 0; i < puzzleCells.length; i++){
+            puzzleCells[i].style.backgroundColor = "";
+         }
+      })
+}
+
+function endBackground(){
+   // remove the event listener for every puzzle cell 
+   for(var i = 0; i < puzzleCells.length; i++){
+      puzzleCells[i].removeEventListener("mouseenter", extendBackground);
+      puzzleCells[i].style.cursor = "url(jpf.pencil.png, pointer)";
+   }
+   // prevent the default action of selecting table text 
+   e.preventDefault()
 }
 
 function swapPuzzle(e){
@@ -80,8 +107,78 @@ function swapPuzzle(e){
          document.getElementById("puzzle").innerHTML = drawPuzzle(puzzle3Hint, puzzle3Rating, puzzle3);
          break;
    }
+   setupPuzzle();
 }
-         
+
+function setupPuzzle(){
+   // match all of the data cells in the puzzle 
+   puzzleCells = document.querySelectorAll("table#hanjieGrid td");
+
+   for(var i = 0; i < puzzleCells.length; i++){
+      puzzleCells[i].style.backgroundColor = "rgb(233, 207, 29)";
+
+      // set the cell background color in response to the mouse down event 
+      puzzleCells[i].onmousedown = setBackground;
+
+      // use a pencil imate as the cursor
+      puzzleCells[i].style.cursor = "url(jpf_pencil.png)";
+   }
+
+   // create object collections of the filled and empty cells 
+   var filled = document.querySelectorAll("table#hanjieGrid td.filled");
+   var empty = document.querySelectorAll("table#hanjieGrid td.empty");
+
+   // create an event listener to highlight the incorrect cells 
+   document.getElementById("peek").addEventListener("click", function(){
+      // display incorrect white cells in pink 
+      for(var i = 0; i < filled.length; i++){
+         if(filled[i].style.backgroundColor === "rgb(255, 255, 255)"){
+            filled[i].style.backgroundColor = "rgb(255, 101, 101)";
+         }
+      }
+      // display incorrect grey cells in red 
+      for(var i = 0; i < empty.length; i++){
+         if(empty[i].style.backgroundColor === "rgb(101, 101, 101)"){
+            empty[i].style.backgroundColor = "rgb(255, 101, 101)";
+         }
+      }
+   })
+
+}
+
+function setBackground(e){
+   var cursorType;
+   // set the background based on the keyboard key 
+   if(e.shiftKey){
+      cellBackground = "rgb(233, 207, 29)";      
+      cursorType = "url(jpf_eraser.png)";
+      e.preventDefault();
+   }
+   else if(e.altKey){
+      cellBackground = "rgb(255, 255, 255)";
+      cursorType = "url(jpf_cross.png, pointer";
+      e.preventDefault();
+   }
+   else{
+      cellBackground = "rgb(101, 101, 101)";
+      cursorType = "url(jpf_pencil.png, pointer";
+      e.preventDefault();
+   }
+
+   e.target.style.backgroundColor = cellBackground;
+
+   // create an event listener for every puzzle cell 
+   for(var i = 0; i < puzzleCells.length; i++){
+      puzzleCells[i].addEventListener("mouseenter", extendBackground);   
+      puzzleCells[i].style.cursor = cursorType; 
+   }
+}
+
+function extendBackground(e){
+   e.target.style.backgroundColor = cellBackground;
+
+}
+
 /* ================================================================= */
 
 function drawPuzzle(hint, rating, puzzle) {
@@ -97,7 +194,6 @@ function drawPuzzle(hint, rating, puzzle) {
 
    var totalRows = puzzle.length;
    var totalCols = puzzle[0].length;
-
    /* Loop through the rows to create the rowCount array
       containing the totals for each row in the puzzle */
 
